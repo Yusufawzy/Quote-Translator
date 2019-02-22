@@ -1,28 +1,12 @@
 import requests, json as j, sys
 def saveToDropbox():
     print()
+def translateCode (a,code):
+    translated = requests.get("https://translate.yandex.net/api/v1.5/tr.json/translate?"
+                              "key=trnsl.1.1.20190222T090754Z.b24e780584a1bd6f.65e695d293fdf3784143b923f6a3378e6d433a19&text="+a+"&lang="+code)
+    data = j.loads(translated.text)
+    print("Result is "+data['text'][0])
 
-def searchQuotes():
-    print("Enter a number: 1-Search by Author   2-Search by keyword")
-    n = int(input())
-    PAPERQUOTES_API_ENDPOINT = 'http://api.paperquotes.com/apiv1/quotes?tags=love&limit=5'
-    TOKEN = '1068110706708340|X94MhFNoa6k8uR6YCDMw12ZW6Bc'
-    response = requests.get(PAPERQUOTES_API_ENDPOINT)
-
-    if response.ok:
-
-        quotes = j.loads(response.text).get('results')
-
-        for quote in quotes:
-            print(quote.get('quote'))
-            print(quote.get('author'))
-            print(quote.get('tags'))
-    if (n==1):
-        print("Author: ", end="")
-        a= input()
-    elif (n==2):
-        print("Keyword: " ,end="")
-        a=input()
 def translate (a):
     print("Enter the language code you want to translate to, Found  list of them here:")
     print("https://tech.yandex.com/translate/doc/dg/concepts/api-overview-docpage/#api-overview__languages")
@@ -31,7 +15,7 @@ def translate (a):
     translated = requests.get("https://translate.yandex.net/api/v1.5/tr.json/translate?"
                               "key=trnsl.1.1.20190222T090754Z.b24e780584a1bd6f.65e695d293fdf3784143b923f6a3378e6d433a19&text="+a+"&lang="+code)
     data = j.loads(translated.text)
-    print("Result is "+data['text'][0])
+    print(data['text'][0])
 
 def detect(a):
     #The use of POST request
@@ -39,6 +23,7 @@ def detect(a):
                               "key=trnsl.1.1.20190222T090754Z.b24e780584a1bd6f.65e695d293fdf3784143b923f6a3378e6d433a19&text=" + a)
     data = j.loads(detected.text)
     print("The language code of the given text is \""+data['lang']+"\"")
+
 def quoteOfTheDay():
     a = requests.get('https://favqs.com/api/qotd')
     data = j.loads(a.text)
@@ -48,8 +33,41 @@ def quoteOfTheDay():
     a = input()
     if (a=="Y" or a=="y"):
         translate(data["quote"]["body"])
+
+def searchQuotes():
+    print("Enter a number: 1-Search by Author   2-Search by keyword")
+    n = int(input())
+    if (n==1):#for example "Mark Twain"
+        print("Author: ", end="")
+        a= input()
+        r = requests.get(
+            'https://favqs.com/api/quotes/?filter=' + a + '&type=author&auth_token=238a98be00ce8dd27256e7142658822e',
+            headers={'Authorization': 'Bearer 238a98be00ce8dd27256e7142658822e'})
+    elif (n==2):#for example "Funny"
+        print("Keyword: " ,end="")
+        a=input()
+        r = requests.get('https://favqs.com/api/quotes/?filter='+a+'&type=tag&auth_token=238a98be00ce8dd27256e7142658822e', headers={'Authorization': 'Bearer 238a98be00ce8dd27256e7142658822e'})
+
+    arr=[]
+    data = j.loads(r.text)['quotes']
+    for  i in range(len(data)):
+        try:
+            print("* "+data[i]['body'])
+            arr.append("* "+data[i]['body'])
+        except:
+            continue
+
+    print("Do you want to translate? Y/N")
+    a = input()
+    if (a == "Y" or a == "y"):
+        print("Enter the language code you want to translate to, Found  list of them here:")
+        print("https://tech.yandex.com/translate/doc/dg/concepts/api-overview-docpage/#api-overview__languages")
+        code = input()
+        for e in arr:
+            translateCode(e,code)
+
 def main():
-    try:
+
         print("="*100 + "\n"+"Enter the number of the fuction you want to perform ")
         print("1- Search Quotes")
         print("2- Detect the language of the text")
@@ -75,8 +93,7 @@ def main():
             quoteOfTheDay()
         elif (n==10):
             sys.exit()
-    except:
-        print("BAD CONNECTION.")
+
 while(True):
     main()
 """
