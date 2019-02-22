@@ -4,6 +4,15 @@ import sys
 def saveToDropbox():
     print()
 
+def searchQuotes():
+    print("Enter a number: 1-Search by Author   2-Search by keyword")
+    n = int(input())
+    if (n==1):
+        print("Author: ", end="")
+        a= input()
+    elif (n==2):
+        print("Keyword: " ,end="")
+        a=input()
 def translate (a):
     print("Enter the language code you want to translate to, Found  list of them here:")
     print("https://tech.yandex.com/translate/doc/dg/concepts/api-overview-docpage/#api-overview__languages")
