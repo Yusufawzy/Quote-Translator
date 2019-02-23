@@ -1,8 +1,9 @@
 import requests, json as j, sys
 def saveToDropbox(arr):
     if (len(arr)==0):
-        print("joe")
-    print("Enter File Name: ",end="")
+        print("enter your text: ")
+        a = input(); arr.append(a)
+    print("Enter File Name to be saved in dropbox: ",end="")
     name = input()
     with open(name+".txt", "w") as text_file:
         text_file.write('\n'.join(arr))
@@ -18,9 +19,41 @@ def saveToDropbox(arr):
 
     response = requests.request("POST", url, data=data, headers=headers)
 
-    print(response.text)
+def GetFiles():
+    url = "https://api.dropboxapi.com/2/files/list_folder"
+    payload = "{\r\n    \"path\": \"\",\r\n    \"recursive\": false,\r\n    \"include_media_info\": false,\r\n    \"include_deleted\": false,\r\n    \"include_has_explicit_shared_members\": false,\r\n    \"include_mounted_folders\": true\r\n}"
+    headers = {
+        'Authorization': "Bearer Uc19JCmDglgAAAAAAAAAFrynPR0FtfXSzG3MYmbYXxgC_ZN4IITJ7gIyTMCEX0s-",
+        'Content-Type': "application/json",
+        'cache-control': "no-cache",
+        'Postman-Token': "0824220f-9c82-4233-8d8f-777b19cde82c"
+    }
+    response = requests.request("POST", url, data=payload, headers=headers)
+    data = j.loads(response.text)
+    print("List of your root files:")
+    for e in data["entries"]:
+        if e['.tag'] == "file":
+            print("{}  {}".format(e['name'], e['id']))
 
+def deleteFile():
+    GetFiles()
+    url = "https://api.dropboxapi.com/2/files/delete_v2"
+    print("Enter file name you want to delete followed by '.txt'")
+    a=input()
+    payload = "{ \"path\" : \"/"+a+"\"}"
+    headers = {
+        'Authorization': "Bearer Uc19JCmDglgAAAAAAAAAFrynPR0FtfXSzG3MYmbYXxgC_ZN4IITJ7gIyTMCEX0s-",
+        'Content-Type': "application/json",
+        'cache-control': "no-cache",
+        'Postman-Token': "40e0be50-79e8-4869-b1e5-032f8239d62f"
+    }
 
+    response = requests.request("POST", url, data=payload, headers=headers)
+
+    if response.ok :
+        print("Successfuly Deleted")
+    else :
+        print("There was a problem")
 def translateCode (a,code):
     translated = requests.get("https://translate.yandex.net/api/v1.5/tr.json/translate?"
                               "key=trnsl.1.1.20190222T090754Z.b24e780584a1bd6f.65e695d293fdf3784143b923f6a3378e6d433a19&text="+a+"&lang="+code)
@@ -35,7 +68,7 @@ def translate (a):
     translated = requests.get("https://translate.yandex.net/api/v1.5/tr.json/translate?"
                               "key=trnsl.1.1.20190222T090754Z.b24e780584a1bd6f.65e695d293fdf3784143b923f6a3378e6d433a19&text="+a+"&lang="+code)
     data = j.loads(translated.text)
-    print("Result is "+data['text'][0])
+    print("Result is \"{}\"".format(data['text'][0]))
 
 def detect(a):
     #The use of POST request
@@ -91,24 +124,7 @@ def searchQuotes():
         if (a == "Y" or a == "y"):
             saveToDropbox(translated)
 
-def addQuote():
-    print()
-def deleteUserActivity():
-    print("Enter your user name")
-    a = input()
-    url = "https://favqs.com/api/activities/"
-    querystring = {"type": "user", "filter": a, "auth_token": "238a98be00ce8dd27256e7142658822e"}
-    payload = ""
-    headers = {
-        'Authorization': "Bearer 238a98be00ce8dd27256e7142658822e",
-        'cache-control': "no-cache",
-        'Postman-Token': "10b85633-46dc-4bc8-b74c-8f4901ad0062"
-    }
-    response = requests.request("GET", url, data=payload, headers=headers, params=querystring)
-    data = j.loads(response.text)
-    for e in data['activities']:
-        print("activity_id is {} , message is {} ".format(e['activity_id'],e['message']))
-    print("Enter the activity_id you want to delete: ",end="")
+
 def main():
 
         print("="*100 + "\n"+"Enter the number of the fuction you want to perform ")
@@ -116,10 +132,9 @@ def main():
         print("2- Detect the language of text")
         print("3- Translate your text")
         print("4- Save text to DropBox")
-        print("5- Get the quote of the day")
+        print("5- Get Quote of the day")
         print("6- Get List of your Files in dropbox")
-        print("7- Add your own Quote")
-        print("8- Delete your activity of adding quotes ")
+        print("7- Delete file from dropbox ")
         print("10- Exit")
 
         n = int(input())
@@ -140,10 +155,9 @@ def main():
             quoteOfTheDay()
         elif (n==6):
             GetFiles()
-        elif (n==6):
-            addQuote()
-        elif(n==9):
-            deleteUserActivity()
+        elif (n==7):
+            deleteFile()
+
         elif (n==10):
             sys.exit()
 
