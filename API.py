@@ -124,6 +124,22 @@ def searchQuotes():
         if (a == "Y" or a == "y"):
             saveToDropbox(translated)
 
+def check_delete_request():
+
+    url = "https://httpbin.org/delete"
+
+    payload = ""
+    headers = {
+        'cache-control': "no-cache",
+        'Postman-Token': "b42526b2-7672-4bd0-98a8-b6da6df62af5"
+    }
+
+    response = requests.request("DELETE", url, data=payload, headers=headers)
+
+    print(response.text)
+    print("delete request done.")
+
+
 
 def main():
 
@@ -135,7 +151,8 @@ def main():
         print("5- Get Quote of the day")
         print("6- Get List of your Files in dropbox")
         print("7- Delete file from dropbox ")
-        print("10- Exit")
+        print("10-check delete request")
+        print("11- Exit")
 
         n = int(input())
         if (n == 1):
@@ -157,8 +174,10 @@ def main():
             GetFiles()
         elif (n==7):
             deleteFile()
-
         elif (n==10):
+            check_delete_request()
+
+        elif (n==11):
             sys.exit()
 
 while(True):
