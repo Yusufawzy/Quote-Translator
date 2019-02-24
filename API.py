@@ -173,11 +173,13 @@ def main():
         elif (n==8):
             check_delete_request()
         elif (n==9):
-            sys.exit()
+            sys.exit(0)
 while(True):
     try:
         main()
-    except:
+    except SystemExit :
+        sys.exit(0);
+    except :
         print("An Error has occured, Please try again")
 """
 en - English ( default )
