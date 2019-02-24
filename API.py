@@ -1,12 +1,13 @@
 import requests, json as j, sys
+
 def saveToDropbox(arr):
     if (len(arr)==0):
         print("enter your text: ")
         a = input(); arr.append(a)
     print("Enter File Name to be saved in dropbox: ",end="")
     name = input()
-    with open(name+".txt", "w") as text_file:
-        text_file.write('\n'.join(arr))
+    with open(name+".txt", "w",encoding='utf-8') as text_file:
+        text_file.write('\n'.join(arr),)
     url = "https://content.dropboxapi.com/2/files/upload"
     data = open('./'+name+'.txt', 'rb').read()
     headers = {
@@ -18,6 +19,8 @@ def saveToDropbox(arr):
     }
 
     response = requests.request("POST", url, data=data, headers=headers)
+    print("The file has been added successfully ")
+
 
 def GetFiles():
     url = "https://api.dropboxapi.com/2/files/list_folder"
@@ -47,18 +50,18 @@ def deleteFile():
         'cache-control': "no-cache",
         'Postman-Token': "40e0be50-79e8-4869-b1e5-032f8239d62f"
     }
-
     response = requests.request("POST", url, data=payload, headers=headers)
-
     if response.ok :
         print("Successfuly Deleted")
     else :
         print("There was a problem")
+
 def translateCode (a,code):
     translated = requests.get("https://translate.yandex.net/api/v1.5/tr.json/translate?"
                               "key=trnsl.1.1.20190222T090754Z.b24e780584a1bd6f.65e695d293fdf3784143b923f6a3378e6d433a19&text="+a+"&lang="+code)
     data = j.loads(translated.text)
     print(data['text'][0])
+    return data['text'][0]
 
 def translate (a):
     print("Enter the language code you want to translate to, Found  list of them here:")
@@ -122,27 +125,21 @@ def searchQuotes():
         print("Do you want to save to Dropbox? Y/N")
         a = input()
         if (a == "Y" or a == "y"):
+            print(translated)
             saveToDropbox(translated)
 
 def check_delete_request():
-
     url = "https://httpbin.org/delete"
-
     payload = ""
     headers = {
         'cache-control': "no-cache",
         'Postman-Token': "b42526b2-7672-4bd0-98a8-b6da6df62af5"
     }
-
     response = requests.request("DELETE", url, data=payload, headers=headers)
-
     print(response.text)
     print("delete request done.")
 
-
-
 def main():
-
         print("="*100 + "\n"+"Enter the number of the fuction you want to perform ")
         print("1- Search Quotes,Translate Them,Save to Dropbox")
         print("2- Detect the language of text")
@@ -151,8 +148,8 @@ def main():
         print("5- Get Quote of the day")
         print("6- Get List of your Files in dropbox")
         print("7- Delete file from dropbox ")
-        print("10-check delete request")
-        print("11- Exit")
+        print("8- Check delete request")
+        print("9- Exit")
 
         n = int(input())
         if (n == 1):
@@ -165,7 +162,6 @@ def main():
             print("Enter the text you want to Translate")
             a = input()
             translate(a)
-
         elif(n==4):
             saveToDropbox([])
         elif(n==5):
@@ -174,14 +170,15 @@ def main():
             GetFiles()
         elif (n==7):
             deleteFile()
-        elif (n==10):
+        elif (n==8):
             check_delete_request()
-
-        elif (n==11):
+        elif (n==9):
             sys.exit()
-
 while(True):
-    main()
+    try:
+        main()
+    except:
+        print("An Error has occured, Please try again")
 """
 en - English ( default )
 be - Bengali
